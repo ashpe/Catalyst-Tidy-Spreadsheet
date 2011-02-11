@@ -1,0 +1,9 @@
+<p>
+
+Submit a file to split <br />
+<form enctype="multipart/form-data" method="post" action="[% c.uri_for('imported_file') %]" >
+File: <input type="file" name="file" / ><br /><br />
+Delim: <input type="text" value="," name="delimiter" />
+<br /><input type="Submit" value="Submit" />
+</form>
+</p>
