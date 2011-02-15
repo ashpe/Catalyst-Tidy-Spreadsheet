@@ -40,6 +40,9 @@ sub imported_file :Local {
 	my ($self, $c) = @_;
 
 
+        my $colsplit = $c->request->params->{colsplit};
+        my $rowsplit = $c->request->params->{rowsplit};
+
 	my $upload = $c->request->upload('file');
 	my $file = $upload->filename;
         my $target = "root/downloads/" . $file;	
@@ -53,15 +56,21 @@ sub imported_file :Local {
         my $spreadsheet = Tidy::Spreadsheet->new();
 
         $spreadsheet->load_spreadsheet($target);
-
-        my @headers_array = $spreadsheet->get_headers();
-        my @edited_contents = $spreadsheet->row_split(2,$delimiter);
-        my $newfile = $target. ".fixed";
-        unlink($target);
-
-        $spreadsheet->save_contents($newfile, \@headers_array, \@edited_contents);
-    
         
+        my $newfile = $target . ".fixed";
+        my @headers_array;
+        my @edited_contents;
+
+        if ($rowsplit eq 'on') {
+           $c->log->debug("Splitting rows.");
+
+            @headers_array = $spreadsheet->get_headers();
+            @edited_contents = $spreadsheet->row_split(2,$delimiter);
+            unlink($target);
+        }
+        
+        $spreadsheet->save_contents($newfile, \@headers_array, \@edited_contents);
+
         my @url = split q{root/}, $newfile; 
 	$c->stash(newfile => $url[1]);
         $c->stash(contents => \@edited_contents);
